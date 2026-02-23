@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">LocalMarketplace</string>
+    <string-array name="regions_array">
+        <item>North America</item>
+        <item>Europe</item>
+        <item>Asia</item>
+        <item>Africa</item>
+        <item>South America</item>
+        <item>Oceania</item>
+    </string-array>
+</resources>

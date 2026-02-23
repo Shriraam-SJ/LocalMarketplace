@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/bluish_white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Profile"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/light_blue"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Details"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:layout_marginBottom="24dp">
+
+        <TableRow>
+            <TextView
+                android:padding="8dp"
+                android:text="Name:"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:padding="8dp"
+                android:text="John Doe" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:padding="8dp"
+                android:text="Email:"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvProfileEmail"
+                android:padding="8dp"
+                android:text="john.doe@example.com" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:padding="8dp"
+                android:text="Member Since:"
+                android:textStyle="bold" />
+            <TextView
+                android:padding="8dp"
+                android:text="Jan 2024" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Marketplace Stats"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1">
+
+        <TableRow>
+            <TextView
+                android:padding="8dp"
+                android:text="Products Published:"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvPublishedCount"
+                android:padding="8dp"
+                android:text="15" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:padding="8dp"
+                android:text="Products Sold:"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvSoldCount"
+                android:padding="8dp"
+                android:text="8" />
+        </TableRow>
+    </TableLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btnUpdateProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Profile"
+        android:backgroundTint="@color/light_blue"
+        android:textColor="@color/white"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:backgroundTint="@color/light_orange"
+        android:textColor="@color/white" />
+
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.LocalMarketplace" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/light_blue</item>
+        <item name="colorPrimaryVariant">@color/dark_blue</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/light_orange</item>
+        <item name="colorSecondaryVariant">@color/light_orange</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/light_blue</item>
+        <!-- Background color. -->
+        <item name="android:windowBackground">@color/bluish_white</item>
+    </style>
+</resources>
