@@ -26,6 +26,12 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), UpdateProfileActivity::class.java)
             startActivity(intent)
         }
+
+        val btnMyNotes = view.findViewById<Button>(R.id.btnMyNotes)
+        btnMyNotes.setOnClickListener {
+            val intent = Intent(requireContext(), NotesActivity::class.java)
+            startActivity(intent)
+        }
         
         return view
     }

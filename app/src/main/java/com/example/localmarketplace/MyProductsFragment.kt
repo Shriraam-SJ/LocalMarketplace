@@ -11,6 +11,7 @@ import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 
@@ -34,12 +35,18 @@ class MyProductsFragment : Fragment() {
     }
 
     private fun displayProducts() {
-        gridMyProducts.removeAllViews()
-        val products = ProductRepository.getProducts()
-
-        for (product in products) {
-            val cardView = createProductCard(product)
-            gridMyProducts.addView(cardView)
+        ProductRepository.getProducts { products ->
+            activity?.runOnUiThread {
+                gridMyProducts.removeAllViews()
+                if (products != null) {
+                    for (product in products) {
+                        val cardView = createProductCard(product)
+                        gridMyProducts.addView(cardView)
+                    }
+                } else {
+                    Toast.makeText(context, "Failed to load products", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -148,9 +155,17 @@ class MyProductsFragment : Fragment() {
                 true
             }
             "Delete" -> {
-                selectedProduct?.let {
-                    ProductRepository.deleteProduct(it)
-                    displayProducts()
+                selectedProduct?.id?.let { id ->
+                    ProductRepository.deleteProduct(id) { success ->
+                        activity?.runOnUiThread {
+                            if (success) {
+                                Toast.makeText(context, "Product deleted", Toast.LENGTH_SHORT).show()
+                                displayProducts()
+                            } else {
+                                Toast.makeText(context, "Failed to delete product", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
                 true
             }

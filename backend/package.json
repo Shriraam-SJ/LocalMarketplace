@@ -1,0 +1,11 @@
+{
+  "name": "localmarketplace-backend",
+  "version": "1.0.0",
+  "description": "Backend for Local Marketplace app",
+  "main": "server.js",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0"
+  }
+}

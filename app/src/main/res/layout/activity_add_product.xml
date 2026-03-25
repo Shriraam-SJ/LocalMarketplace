@@ -48,17 +48,29 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Location"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp"
+            app:endIconMode="custom"
+            app:endIconDrawable="@android:drawable/ic_menu_mylocation">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etProductLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPostalAddress" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnPickOnMap"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick location on Map"
+            android:layout_marginBottom="16dp"
+            app:icon="@android:drawable/ic_dialog_map"/>
 
         <TextView
             android:layout_width="wrap_content"
