@@ -7,7 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI;
@@ -34,7 +35,9 @@ const ProductSchema = new mongoose.Schema({
             type: [Number], // [longitude, latitude]
             required: false
         }
-    }
+    },
+    images: [{ type: String }], // Array of Base64 strings for simplicity in this exercise
+    videos: [{ type: String }]  // Array of Base64 strings
 });
 
 // Index for geospatial queries
@@ -99,7 +102,9 @@ app.post('/api/products', async (req, res) => {
             price: req.body.price,
             location: req.body.location,
             seller: req.body.seller,
-            geojson: req.body.geojson
+            geojson: req.body.geojson,
+            images: req.body.images,
+            videos: req.body.videos
         });
         const newProduct = await product.save();
         res.status(201).json(newProduct);

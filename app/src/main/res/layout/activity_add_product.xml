@@ -75,28 +75,43 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Product Image"
+            android:text="Media (Photos and Videos)"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
-        <ImageView
-            android:id="@+id/ivProductPreview"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_marketproducts"
-            android:background="@drawable/ic_launcher_background"
-            android:backgroundTint="#E0E0E0"
-            android:layout_marginBottom="8dp" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/btnSelectImage"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            <Button
+                android:id="@+id/btnSelectPhotos"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Photos"
+                android:layout_marginEnd="8dp"
+                app:icon="@android:drawable/ic_menu_gallery"/>
+
+            <Button
+                android:id="@+id/btnSelectVideos"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Videos"
+                app:icon="@android:drawable/ic_menu_slideshow"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvMediaStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Change Image (Placeholder)"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="32dp" />
+            android:text="No media selected"
+            android:textSize="12sp"
+            android:layout_marginBottom="32dp"/>
 
         <Button
             android:id="@+id/btnAddProduct"

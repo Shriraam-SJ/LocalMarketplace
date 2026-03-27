@@ -118,6 +118,13 @@ class MyProductsFragment : Fragment() {
         linearLayout.addView(tvLocation)
         cardView.addView(linearLayout)
 
+        cardView.setOnClickListener {
+            val intent = Intent(requireContext(), ProductDetailActivity::class.java).apply {
+                putExtra("PRODUCT", product)
+            }
+            startActivity(intent)
+        }
+
         cardView.setOnLongClickListener {
             selectedProduct = product
             requireActivity().openContextMenu(it)
@@ -145,10 +152,7 @@ class MyProductsFragment : Fragment() {
             "About" -> {
                 selectedProduct?.let {
                     val intent = Intent(requireContext(), ProductDetailActivity::class.java).apply {
-                        putExtra("PRODUCT_NAME", it.name)
-                        putExtra("PRODUCT_PRICE", it.price)
-                        putExtra("PRODUCT_LOCATION", it.location)
-                        putExtra("PRODUCT_SELLER", it.seller)
+                        putExtra("PRODUCT", it)
                     }
                     startActivity(intent)
                 }

@@ -1,45 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/bluish_white">
 
-    <ImageView
-        android:id="@+id/ivDetailImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_marketproducts" />
-
-    <TextView
-        android:id="@+id/tvDetailName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvDetailPrice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/dark_blue"
-        android:textSize="20sp" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vpProductMedia"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="@color/white" />
 
-    <TextView
-        android:id="@+id/tvDetailLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="16sp" />
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tlMediaIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@drawable/tab_selector"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp"
+            app:tabMaxWidth="12dp" />
 
-    <TextView
-        android:id="@+id/tvDetailSeller"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/tvDetailName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvDetailPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/dark_blue"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tvDetailLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textColor="@color/grey" />
+
+        <TextView
+            android:id="@+id/tvDetailSeller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/grey" />
+
+    </LinearLayout>
+</ScrollView>

@@ -7,11 +7,16 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +26,8 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.textfield.TextInputLayout
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.util.Locale
 
 class AddProductActivity : AppCompatActivity() {
@@ -29,6 +36,10 @@ class AddProductActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var selectedLatitude: Double? = null
     private var selectedLongitude: Double? = null
+    
+    private val selectedImages = mutableListOf<String>()
+    private val selectedVideos = mutableListOf<String>()
+    private lateinit var tvMediaStatus: TextView
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -48,6 +59,28 @@ class AddProductActivity : AppCompatActivity() {
             }
         }
 
+    private val requestMediaPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.all { it.value }
+            if (!allGranted) {
+                Toast.makeText(this, "Media permissions denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private val pickImagesLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
+        uris?.forEach { uri ->
+            uriToBase64(uri, true)?.let { selectedImages.add(it) }
+        }
+        updateMediaStatus()
+    }
+
+    private val pickVideosLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
+        uris?.forEach { uri ->
+            uriToBase64(uri, false)?.let { selectedVideos.add(it) }
+        }
+        updateMediaStatus()
+    }
+
     private val mapResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -65,13 +98,17 @@ class AddProductActivity : AppCompatActivity() {
 
         askNotificationPermission()
         createNotificationChannel()
+        checkMediaPermissions()
 
         val etName = findViewById<EditText>(R.id.etProductName)
         val etPrice = findViewById<EditText>(R.id.etProductPrice)
         val etLocation = findViewById<EditText>(R.id.etProductLocation)
         val tilLocation = findViewById<TextInputLayout>(R.id.tilLocation)
         val btnPickOnMap = findViewById<Button>(R.id.btnPickOnMap)
+        val btnSelectPhotos = findViewById<Button>(R.id.btnSelectPhotos)
+        val btnSelectVideos = findViewById<Button>(R.id.btnSelectVideos)
         val btnAdd = findViewById<Button>(R.id.btnAddProduct)
+        tvMediaStatus = findViewById(R.id.tvMediaStatus)
 
         tilLocation.setEndIconOnClickListener {
             checkLocationPermissions()
@@ -80,6 +117,14 @@ class AddProductActivity : AppCompatActivity() {
         btnPickOnMap.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
             mapResultLauncher.launch(intent)
+        }
+
+        btnSelectPhotos.setOnClickListener {
+            pickImagesLauncher.launch("image/*")
+        }
+
+        btnSelectVideos.setOnClickListener {
+            pickVideosLauncher.launch("video/*")
         }
 
         btnAdd.setOnClickListener {
@@ -96,7 +141,9 @@ class AddProductActivity : AppCompatActivity() {
                     name = name,
                     price = "₹$rawPrice",
                     location = locationText,
-                    geojson = geojson
+                    geojson = geojson,
+                    images = selectedImages,
+                    videos = selectedVideos
                 )
                 
                 ProductRepository.addProduct(product) { success ->
@@ -113,6 +160,48 @@ class AddProductActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun checkMediaPermissions() {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO)
+        } else {
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        val toRequest = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (toRequest.isNotEmpty()) {
+            requestMediaPermissionLauncher.launch(toRequest.toTypedArray())
+        }
+    }
+
+    private fun updateMediaStatus() {
+        tvMediaStatus.text = "Selected: ${selectedImages.size} photos, ${selectedVideos.size} videos"
+    }
+
+    private fun uriToBase64(uri: Uri, isImage: Boolean): String? {
+        return try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            val bytes = inputStream?.readBytes()
+            inputStream?.close()
+            if (bytes != null) {
+                // If it's an image, maybe compress it to avoid huge payloads
+                if (isImage) {
+                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    val outputStream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                    Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
+                } else {
+                    Base64.encodeToString(bytes, Base64.DEFAULT)
+                }
+            } else null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 

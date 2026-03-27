@@ -1,6 +1,7 @@
 package com.example.localmarketplace
 
 import android.graphics.Paint
+import android.media.MediaPlayer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -9,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
+import java.io.IOException
 
 class NotesAdapter(
     private var notes: MutableList<Note>,
@@ -17,10 +20,15 @@ class NotesAdapter(
     private val onNoteDeleted: (Note) -> Unit
 ) : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
 
+    private var mediaPlayer: MediaPlayer? = null
+    private var currentlyPlayingId: Int = -1
+
     class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cbNote: CheckBox = view.findViewById(R.id.cbNote)
         val etNoteItem: EditText = view.findViewById(R.id.etNoteItem)
         val btnDeleteNote: ImageButton = view.findViewById(R.id.btnDeleteNote)
+        val layoutAudio: LinearLayout = view.findViewById(R.id.layoutAudio)
+        val btnPlayPause: ImageButton = view.findViewById(R.id.btnPlayPause)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -35,6 +43,28 @@ class NotesAdapter(
         holder.cbNote.isChecked = note.isChecked
         
         updateStrikeThrough(holder.etNoteItem, note.isChecked)
+
+        // Audio Visibility
+        if (!note.audioPath.isNullOrEmpty()) {
+            holder.layoutAudio.visibility = View.VISIBLE
+            
+            // Set correct icon if this is the one playing
+            if (currentlyPlayingId == note.id) {
+                holder.btnPlayPause.setImageResource(android.R.drawable.ic_media_pause)
+            } else {
+                holder.btnPlayPause.setImageResource(android.R.drawable.ic_media_play)
+            }
+
+            holder.btnPlayPause.setOnClickListener {
+                if (currentlyPlayingId == note.id) {
+                    stopPlaying()
+                } else {
+                    startPlaying(note.audioPath!!, note.id)
+                }
+            }
+        } else {
+            holder.layoutAudio.visibility = View.GONE
+        }
 
         holder.cbNote.setOnCheckedChangeListener { _, isChecked ->
             note.isChecked = isChecked
@@ -55,6 +85,31 @@ class NotesAdapter(
                 onNoteUpdated(note)
             }
         })
+    }
+
+    private fun startPlaying(path: String, id: Int) {
+        stopPlaying()
+        mediaPlayer = MediaPlayer().apply {
+            try {
+                setDataSource(path)
+                prepare()
+                start()
+                currentlyPlayingId = id
+                notifyDataSetChanged()
+                setOnCompletionListener {
+                    stopPlaying()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun stopPlaying() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        currentlyPlayingId = -1
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = notes.size

@@ -1,11 +1,12 @@
 package com.example.localmarketplace
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Location(
     val type: String = "Point",
     val coordinates: List<Double> // [longitude, latitude]
-)
+) : Serializable
 
 data class Product(
     @SerializedName("_id")
@@ -14,5 +15,7 @@ data class Product(
     val price: String,
     val location: String, // String address
     val seller: String = "Me",
-    val geojson: Location? = null
-)
+    val geojson: Location? = null,
+    val images: List<String> = emptyList(), // Base64 strings
+    val videos: List<String> = emptyList()  // Base64 strings
+) : Serializable
