@@ -19,11 +19,10 @@ mongoose.connect(mongoURI)
 
 // --- Schemas ---
 
-// Product Schema with GeoJSON support
 const ProductSchema = new mongoose.Schema({
     name: { type: String, required: true },
     price: { type: String, required: true },
-    location: { type: String, required: true }, // Textual address
+    location: { type: String, required: true },
     seller: { type: String, default: 'Me' },
     geojson: {
         type: {
@@ -32,20 +31,17 @@ const ProductSchema = new mongoose.Schema({
             default: 'Point'
         },
         coordinates: {
-            type: [Number], // [longitude, latitude]
+            type: [Number],
             required: false
         }
     },
-    images: [{ type: String }], // Array of Base64 strings for simplicity in this exercise
-    videos: [{ type: String }]  // Array of Base64 strings
+    images: [{ type: String }],
+    videos: [{ type: String }]
 });
 
-// Index for geospatial queries
 ProductSchema.index({ geojson: '2dsphere' });
-
 const Product = mongoose.model('Product', ProductSchema);
 
-// User Schema
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -55,7 +51,6 @@ const User = mongoose.model('User', UserSchema);
 
 // --- Routes ---
 
-// AUTH ROUTES
 app.post('/api/auth/signup', async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -85,7 +80,26 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// PRODUCT ROUTES
+// GET /api/products/ids - returns only product IDs for progressive loading
+app.get('/api/products/ids', async (req, res) => {
+    try {
+        const products = await Product.find({}, '_id');
+        res.json(products.map(p => p._id));
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+        res.json(product);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find();

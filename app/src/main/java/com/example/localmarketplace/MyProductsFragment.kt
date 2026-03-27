@@ -119,9 +119,8 @@ class MyProductsFragment : Fragment() {
         cardView.addView(linearLayout)
 
         cardView.setOnClickListener {
-            val intent = Intent(requireContext(), ProductDetailActivity::class.java).apply {
-                putExtra("PRODUCT", product)
-            }
+            ProductRepository.selectedProduct = product
+            val intent = Intent(requireContext(), ProductDetailActivity::class.java)
             startActivity(intent)
         }
 
@@ -151,9 +150,8 @@ class MyProductsFragment : Fragment() {
         return when (item.title) {
             "About" -> {
                 selectedProduct?.let {
-                    val intent = Intent(requireContext(), ProductDetailActivity::class.java).apply {
-                        putExtra("PRODUCT", it)
-                    }
+                    ProductRepository.selectedProduct = it
+                    val intent = Intent(requireContext(), ProductDetailActivity::class.java)
                     startActivity(intent)
                 }
                 true

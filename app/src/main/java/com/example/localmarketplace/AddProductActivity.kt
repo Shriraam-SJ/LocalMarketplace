@@ -14,8 +14,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +42,7 @@ class AddProductActivity : AppCompatActivity() {
     private val selectedImages = mutableListOf<String>()
     private val selectedVideos = mutableListOf<String>()
     private lateinit var tvMediaStatus: TextView
+    private lateinit var loadingOverlay: FrameLayout
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -109,6 +112,7 @@ class AddProductActivity : AppCompatActivity() {
         val btnSelectVideos = findViewById<Button>(R.id.btnSelectVideos)
         val btnAdd = findViewById<Button>(R.id.btnAddProduct)
         tvMediaStatus = findViewById(R.id.tvMediaStatus)
+        loadingOverlay = findViewById(R.id.loadingOverlay)
 
         tilLocation.setEndIconOnClickListener {
             checkLocationPermissions()
@@ -133,6 +137,8 @@ class AddProductActivity : AppCompatActivity() {
             val locationText = etLocation.text.toString()
 
             if (name.isNotEmpty() && rawPrice.isNotEmpty() && locationText.isNotEmpty()) {
+                loadingOverlay.visibility = View.VISIBLE
+                
                 val geojson = if (selectedLatitude != null && selectedLongitude != null) {
                     Location(coordinates = listOf(selectedLongitude!!, selectedLatitude!!))
                 } else null
@@ -148,6 +154,7 @@ class AddProductActivity : AppCompatActivity() {
                 
                 ProductRepository.addProduct(product) { success ->
                     runOnUiThread {
+                        loadingOverlay.visibility = View.GONE
                         if (success) {
                             Toast.makeText(this, "Product Added: $name", Toast.LENGTH_SHORT).show()
                             showNotification(name)
@@ -189,11 +196,10 @@ class AddProductActivity : AppCompatActivity() {
             val bytes = inputStream?.readBytes()
             inputStream?.close()
             if (bytes != null) {
-                // If it's an image, maybe compress it to avoid huge payloads
                 if (isImage) {
                     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                     val outputStream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream) // Reduced quality for faster upload
                     Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT)
                 } else {
                     Base64.encodeToString(bytes, Base64.DEFAULT)

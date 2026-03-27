@@ -12,12 +12,7 @@ class ProductDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_detail)
 
-        val product = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("PRODUCT", Product::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getSerializableExtra("PRODUCT") as? Product
-        }
+        val product = ProductRepository.selectedProduct
 
         if (product != null) {
             findViewById<TextView>(R.id.tvDetailName).text = product.name
@@ -36,6 +31,15 @@ class ProductDetailActivity : AppCompatActivity() {
                 viewPager.adapter = MediaPagerAdapter(mediaItems)
                 TabLayoutMediator(tabLayout, viewPager) { _, _ -> }.attach()
             }
+        } else {
+            // Handle case where product is not found
+            finish()
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clear the selected product to avoid keeping large data in memory
+        // Optional: ProductRepository.selectedProduct = null
     }
 }

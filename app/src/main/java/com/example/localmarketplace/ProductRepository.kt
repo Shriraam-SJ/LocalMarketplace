@@ -6,6 +6,8 @@ import retrofit2.Response
 
 object ProductRepository {
     private val apiService = RetrofitClient.instance
+    
+    var selectedProduct: Product? = null
 
     fun addProduct(product: Product, onResult: (Boolean) -> Unit) {
         apiService.addProduct(product).enqueue(object : Callback<Product> {
@@ -15,6 +17,38 @@ object ProductRepository {
 
             override fun onFailure(call: Call<Product>, t: Throwable) {
                 onResult(false)
+            }
+        })
+    }
+
+    fun getProductIds(onResult: (List<String>?) -> Unit) {
+        apiService.getProductIds().enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    onResult(response.body())
+                } else {
+                    onResult(null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                onResult(null)
+            }
+        })
+    }
+
+    fun getProductById(id: String, onResult: (Product?) -> Unit) {
+        apiService.getProductById(id).enqueue(object : Callback<Product> {
+            override fun onResponse(call: Call<Product>, response: Response<Product>) {
+                if (response.isSuccessful) {
+                    onResult(response.body())
+                } else {
+                    onResult(null)
+                }
+            }
+
+            override fun onFailure(call: Call<Product>, t: Throwable) {
+                onResult(null)
             }
         })
     }

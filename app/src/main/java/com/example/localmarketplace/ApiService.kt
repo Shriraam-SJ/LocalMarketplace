@@ -13,6 +13,12 @@ interface ApiService {
     @POST("api/auth/login")
     fun login(@Body user: User): Call<AuthResponse>
 
+    @GET("api/products/ids")
+    fun getProductIds(): Call<List<String>>
+
+    @GET("api/products/{id}")
+    fun getProductById(@Path("id") id: String): Call<Product>
+
     @GET("api/products")
     fun getProducts(): Call<List<Product>>
 
