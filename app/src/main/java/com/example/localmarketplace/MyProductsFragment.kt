@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -31,17 +33,18 @@ class MyProductsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        displayProducts()
+        displayProductsProgressively()
     }
 
-    private fun displayProducts() {
-        ProductRepository.getProducts { products ->
+    private fun displayProductsProgressively() {
+        gridMyProducts.removeAllViews()
+        ProductRepository.getProductIds { ids ->
             activity?.runOnUiThread {
-                gridMyProducts.removeAllViews()
-                if (products != null) {
-                    for (product in products) {
-                        val cardView = createProductCard(product)
-                        gridMyProducts.addView(cardView)
+                if (ids != null) {
+                    for (id in ids) {
+                        val placeholder = createPlaceholderCard()
+                        gridMyProducts.addView(placeholder)
+                        fetchIndividualProduct(id, placeholder)
                     }
                 } else {
                     Toast.makeText(context, "Failed to load products", Toast.LENGTH_SHORT).show()
@@ -50,20 +53,49 @@ class MyProductsFragment : Fragment() {
         }
     }
 
-    private fun createProductCard(product: Product): CardView {
+    private fun fetchIndividualProduct(id: String, placeholder: CardView) {
+        ProductRepository.getProductById(id) { product ->
+            activity?.runOnUiThread {
+                if (product != null) {
+                    updateCardWithProduct(placeholder, product)
+                } else {
+                    gridMyProducts.removeView(placeholder)
+                }
+            }
+        }
+    }
+
+    private fun createPlaceholderCard(): CardView {
         val cardView = CardView(requireContext()).apply {
             layoutParams = GridLayout.LayoutParams().apply {
                 width = 0
-                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                height = 180.dpToPx()
                 columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 setMargins(8.dpToPx(), 8.dpToPx(), 8.dpToPx(), 8.dpToPx())
             }
             radius = 12.dpToPx().toFloat()
-            cardElevation = 6.dpToPx().toFloat()
-            isClickable = true
-            isFocusable = true
+            cardElevation = 2.dpToPx().toFloat()
         }
 
+        val progressBar = ProgressBar(requireContext()).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.Gravity.CENTER
+            )
+        }
+        
+        val frameLayout = FrameLayout(requireContext())
+        frameLayout.addView(progressBar)
+        cardView.addView(frameLayout)
+        
+        return cardView
+    }
+
+    private fun updateCardWithProduct(cardView: CardView, product: Product) {
+        cardView.removeAllViews()
+        cardView.cardElevation = 6.dpToPx().toFloat()
+        
         val linearLayout = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(8.dpToPx(), 8.dpToPx(), 8.dpToPx(), 8.dpToPx())
@@ -131,8 +163,6 @@ class MyProductsFragment : Fragment() {
         }
 
         registerForContextMenu(cardView)
-
-        return cardView
     }
 
     override fun onCreateContextMenu(
@@ -162,7 +192,7 @@ class MyProductsFragment : Fragment() {
                         activity?.runOnUiThread {
                             if (success) {
                                 Toast.makeText(context, "Product deleted", Toast.LENGTH_SHORT).show()
-                                displayProducts()
+                                displayProductsProgressively()
                             } else {
                                 Toast.makeText(context, "Failed to delete product", Toast.LENGTH_SHORT).show()
                             }
